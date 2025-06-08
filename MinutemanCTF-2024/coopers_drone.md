@@ -103,13 +103,15 @@ GDB:
 Here rcx is multiplied by the value at 0x4020a5 and then added with the value at 0x4020ad. From GDB and Ghidra, we can see that at 0x4020a5 is 0x19660d, at 0x4020ad is 0x3c6ef35f, and that these values are hardcoded (and never change). Finally, ecx is ANDed with 0xffffffff, essentially only keeping the lower 4 bytes. Immediately after returning is the comparison, so with this we have enough information to formulate a math equation.
 
 ```math
-0xDEADBEEF = ((x \cdot 0x19660D) + 0x3C6EF35F) \wedge 0xFFFFFFFF \\  
-\text{} \\  
-x \cdot 0x19660D = (0xDEADBEEF - 0x3C6EF35F) \wedge 0xFFFFFFFF \\  
-x \cdot 0x19660D = 0xA0BDFE10 \wedge 0xFFFFFFFF \\  
-x \cdot 0x19660D = 0xA0BDFE10 \\  
-\text{} \\  
-x = \dfrac{0xA0BDFE10}{0x19660D} \\  
+\begin{gathered}
+0xDEADBEEF = ((x \cdot 0x19660D) + 0x3C6EF35F) \wedge 0xFFFFFFFF \\
+\text{} \\
+x \cdot 0x19660D = (0xDEADBEEF - 0x3C6EF35F) \wedge 0xFFFFFFFF \\
+x \cdot 0x19660D = 0xA0BDFE10 \wedge 0xFFFFFFFF \\
+x \cdot 0x19660D = 0xA0BDFE10 \\
+\text{} \\
+x = \dfrac{0xA0BDFE10}{0x19660D} \\
+\end{gathered}
 ```
 
 Unfortunately, this results in a non-integer (1620.16...) which we won't be able to input into the program. However, we can take advantage of the AND with 0xffffffff since it allows us to input numbers larger than 0xdeadbeef because it extracts the lower 4 bytes. If we find an input that after being multiplied and added as above equals a number like 0x123deadbeef, then we can input it in decimal form to end up with 0xdeadbeef. (This also means that there is more than one solution!)
@@ -141,25 +143,27 @@ This means that when $b$ is multiplied by $a$, their product "wraps around" to 1
 Here's a short proof:
 
 ```math
-\text{let } a = 0xDEADBEEF \\  
-b = 0x19660D \\  
-c = 0x3C6EF35F \\  
-m = 0xFFFFFFFF + 1 = 0x100000000 \\  
+\begin{gathered}
+\text{let } a = 0xDEADBEEF \\
+b = 0x19660D \\
+c = 0x3C6EF35F \\
+m = 0xFFFFFFFF + 1 = 0x100000000 \\
 
-\text{} \\  
-\text{let } x \equiv (a - c) \cdot b^{-1} \mod{m} \\  
-\text{Now input $x$ into the program:} \\  
-\text{} \\  
+\text{} \\
+\text{let } x \equiv (a - c) \cdot b^{-1} \mod{m} \\
+\text{Now input $x$ into the program:} \\
+\text{} \\
+\end{gathered} \\
 
 \begin{aligned}
-y &= (x \cdot 0x19660D + 0x3C6EF35F) \wedge 0xFFFFFFFF \\  
-&= (x \cdot b + c) \wedge (m - 1) \\  
-&\equiv (((a - c) \cdot b^{-1}) \cdot b + c) \mod{m} \\  
-&\equiv ((a - c) \cdot ( b^{-1} \cdot b) + c) \mod{m} \\  
-&\equiv ((a - c) \cdot 1 + c) \mod{m} \hspace{3em} \text{by def. of mod. inv.} \\  
-&\equiv a \mod{m} \\  
-&\equiv 0xDEADBEEF \wedge 0xFFFFFFFF \\  
-&= 0xDEADBEEF \\  
+y &= (x \cdot 0x19660D + 0x3C6EF35F) \wedge 0xFFFFFFFF \\
+&= (x \cdot b + c) \wedge (m - 1) \\
+&\equiv (((a - c) \cdot b^{-1}) \cdot b + c) \mod{m} \\
+&\equiv ((a - c) \cdot ( b^{-1} \cdot b) + c) \mod{m} \\
+&\equiv ((a - c) \cdot 1 + c) \mod{m} \hspace{3em} \text{by def. of mod. inv.} \\
+&\equiv a \mod{m} \\
+&\equiv 0xDEADBEEF \wedge 0xFFFFFFFF \\
+&= 0xDEADBEEF \\
 \end{aligned}
 ```
 
