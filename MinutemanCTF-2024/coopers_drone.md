@@ -151,9 +151,9 @@ m = 0xFFFFFFFF + 1 = 0x100000000 \\
 
 \text{} \\
 \text{let } x \equiv (a - c) \cdot b^{-1} \mod{m} \\
-\text{Now input $x$ into the program:} \\
-\text{} \\
+\text{Now input $`x`$ into the program:} \\
 \end{gathered} \\
+\text{} \\
 
 \begin{aligned}
 y &= (x \cdot 0x19660D + 0x3C6EF35F) \wedge 0xFFFFFFFF \\
